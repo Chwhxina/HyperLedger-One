@@ -110,22 +110,22 @@ public class CatContract implements ContractInterface {
         return cat;
     }
 
-//    @Transaction
-//    public Cat deleteCat(final Context ctx, final String key) {
-//
-//        ChaincodeStub stub = ctx.getStub();
-//        String catState = stub.getStringState(key);
-//
-//        if (StringUtils.isBlank(catState)) {
-//            String errorMessage = String.format("Cat %s does not exist", key);
-//            System.out.println(errorMessage);
-//            throw new ChaincodeException(errorMessage);
-//        }
-//
-//        stub.delState(key);
-//
-//        return JSON.parseObject(catState , Cat.class);
-//    }
+    @Transaction
+    public Cat deleteCat(final Context ctx, final String key) {
+
+        ChaincodeStub stub = ctx.getStub();
+        String catState = stub.getStringState(key);
+
+        if (StringUtils.isBlank(catState)) {
+            String errorMessage = String.format("Cat %s does not exist", key);
+            System.out.println(errorMessage);
+            throw new ChaincodeException(errorMessage);
+        }
+
+        stub.delState(key);
+
+        return JSON.parseObject(catState , Cat.class);
+    }
 
     @Override
     public void beforeTransaction(Context ctx) {
