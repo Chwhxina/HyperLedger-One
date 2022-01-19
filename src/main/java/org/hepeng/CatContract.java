@@ -81,8 +81,8 @@ public class CatContract implements ContractInterface {
 
         Cat cat = new Cat().setName(name)
                 .setAge(age)
-                .setBreed(color)
-                .setColor(breed);
+                .setBreed(breed)
+                .setColor(color);
 
         stub.putStringState(key, JSON.toJSONString(cat));
         return cat;
@@ -102,8 +102,8 @@ public class CatContract implements ContractInterface {
 
         Cat cat = new Cat().setName(name)
                 .setAge(age)
-                .setBreed(color)
-                .setColor(breed);
+                .setBreed(breed)
+                .setColor(color);
 
         stub.putStringState(key, JSON.toJSONString(cat));
 
