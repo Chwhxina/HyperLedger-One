@@ -28,6 +28,19 @@
             <id>artifactory</id>
             <url>https://hyperledger.jfrog.io/hyperledger/fabric-maven</url>
         </repository>
+
+
+        <repository>
+            <id>aliyun</id>
+            <url>https://maven.aliyun.com/repository/central</url>
+            <releases>
+                <enabled>true</enabled>
+            </releases>
+            <snapshots>
+                <enabled>true</enabled>
+            </snapshots>
+        </repository>
+
     </repositories>
 
     <dependencies>
