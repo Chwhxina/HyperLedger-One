@@ -1,6 +1,8 @@
 package org.hepeng;
 
 import com.alibaba.fastjson.JSON;
+import lombok.extern.java.Log;
+import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.hyperledger.fabric.contract.Context;
 import org.hyperledger.fabric.contract.ContractInterface;
@@ -14,6 +16,7 @@ import org.hyperledger.fabric.shim.ChaincodeException;
 import org.hyperledger.fabric.shim.ChaincodeStub;
 
 import java.util.Random;
+import java.util.logging.Level;
 
 /**
  * author he peng
@@ -22,7 +25,7 @@ import java.util.Random;
 
 
 @Contract(
-        name = "Cat",
+        name = "CatContract",
         info = @Info(
                 title = "Cat contract",
                 description = "The hyperlegendary car contract",
@@ -35,6 +38,7 @@ import java.util.Random;
                         name = "F Carr",
                         url = "https://hyperledger.example.com")))
 @Default
+@Log
 public class CatContract implements ContractInterface {
 
 
@@ -125,6 +129,106 @@ public class CatContract implements ContractInterface {
         stub.delState(key);
 
         return JSON.parseObject(catState , Cat.class);
+    }
+
+    @Transaction
+    public byte[] queryPrivateCatHash(final Context ctx, final String key) {
+
+        ChaincodeStub stub = ctx.getStub();
+
+        String collection = getCollectionName(stub);
+        byte[] hash = stub.getPrivateDataHash(collection, key);
+
+        if (ArrayUtils.isEmpty(hash)) {
+            String errorMessage = String.format("Private Cat %s does not exist", key);
+            log.log(Level.WARNING , errorMessage);
+            throw new ChaincodeException(errorMessage);
+        }
+
+        return hash;
+    }
+
+    @Transaction
+    public Cat queryPrivateCat(final Context ctx, final String key) {
+
+        ChaincodeStub stub = ctx.getStub();
+
+        log.info(String.format("查询私有数据 , key [%s] , mspId [%s] " , stub.getMspId() , key));
+
+        String collection = getCollectionName(stub);
+        String catState = stub.getPrivateDataUTF8(collection , key);
+
+        if (StringUtils.isBlank(catState)) {
+            String errorMessage = String.format("Private Cat %s does not exist", key);
+            log.log(Level.WARNING , errorMessage);
+            throw new ChaincodeException(errorMessage);
+        }
+
+        return JSON.parseObject(catState , PrivateCat.class);
+    }
+
+
+    @Transaction
+    public PrivateCat createPrivateCat(final Context ctx, final String key , String name , Integer age , String color , String breed) {
+
+        ChaincodeStub stub = ctx.getStub();
+        log.info(String.format("创建私有数据 , key [%s] , mspId [%s] , name [%s] age [%s] color [%s] breed [%s] " , stub.getMspId() , key , name , age , color , breed));
+
+        String collection = getCollectionName(stub);
+        String catState = stub.getPrivateDataUTF8(collection , key);
+
+        if (StringUtils.isNotBlank(catState)) {
+            String errorMessage = String.format("Private Cat %s already exists", key);
+            log.log(Level.WARNING , errorMessage);
+            throw new ChaincodeException(errorMessage);
+        }
+
+        PrivateCat cat = new PrivateCat();
+        cat.setName(name)
+                .setAge(age)
+                .setBreed(breed)
+                .setColor(color);
+
+        cat.setMspId(stub.getMspId());
+
+        stub.putPrivateData(collection , key, JSON.toJSONString(cat));
+
+        return cat;
+    }
+
+    @Transaction
+    public PrivateCat updatePrivateCat(final Context ctx, final String key , String name , Integer age , String color , String breed) {
+
+        ChaincodeStub stub = ctx.getStub();
+        log.info(String.format("更新私有数据 , key [%s] , mspId [%s] , name [%s] age [%s] color [%s] breed [%s] " , stub.getMspId() , key , name , age , color , breed));
+
+        String collection = getCollectionName(stub);
+        String catState = stub.getPrivateDataUTF8(collection , key);
+
+        if (StringUtils.isBlank(catState)) {
+            String errorMessage = String.format("Private Cat %s does not exist", key);
+            log.log(Level.WARNING , errorMessage);
+            throw new ChaincodeException(errorMessage);
+        }
+
+        PrivateCat cat = new PrivateCat();
+        cat.setName(name)
+                .setAge(age)
+                .setBreed(breed)
+                .setColor(color);
+
+        cat.setMspId(stub.getMspId());
+
+        stub.putPrivateData(collection , key, JSON.toJSONString(cat));
+
+        return cat;
+    }
+
+    private String getCollectionName(final ChaincodeStub stub) {
+
+        String name = "collection" + stub.getMspId() + "Cats";
+        log.info(String.format("私有数据集合名称 [%s]" , name));
+        return name;
     }
 
     @Override
