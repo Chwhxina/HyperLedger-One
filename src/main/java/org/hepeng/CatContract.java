@@ -175,13 +175,6 @@ public class CatContract implements ContractInterface {
         log.info(String.format("创建私有数据 , mspId [%s] , key [%s] , name [%s] age [%s] color [%s] breed [%s] " , stub.getMspId() , key , name , age , color , breed));
 
         String collection = getCollectionName(stub);
-        String catState = stub.getPrivateDataUTF8(collection , key);
-
-        if (StringUtils.isNotBlank(catState)) {
-            String errorMessage = String.format("Private Cat %s already exists", key);
-            log.log(Level.WARNING , errorMessage);
-            throw new ChaincodeException(errorMessage);
-        }
 
         PrivateCat cat = new PrivateCat();
         cat.setName(name)
@@ -207,13 +200,6 @@ public class CatContract implements ContractInterface {
         log.info(String.format("更新私有数据 , mspId [%s] , key [%s] , name [%s] age [%s] color [%s] breed [%s] " , stub.getMspId() , key , name , age , color , breed));
 
         String collection = getCollectionName(stub);
-        String catState = stub.getPrivateDataUTF8(collection , key);
-
-        if (StringUtils.isBlank(catState)) {
-            String errorMessage = String.format("Private Cat %s does not exist", key);
-            log.log(Level.WARNING , errorMessage);
-            throw new ChaincodeException(errorMessage);
-        }
 
         PrivateCat cat = new PrivateCat();
         cat.setName(name)
@@ -233,26 +219,16 @@ public class CatContract implements ContractInterface {
     }
 
     @Transaction
-    public Cat deletePrivateCat(final Context ctx, final String key) {
+    public void deletePrivateCat(final Context ctx, final String key) {
 
         ChaincodeStub stub = ctx.getStub();
 
         log.info(String.format("删除私有数据 , mspId [%s] , key [%s] " , stub.getMspId() , key));
 
-
         String collection = getCollectionName(stub);
-        String catState = stub.getPrivateDataUTF8(collection , key);
-
-        if (StringUtils.isBlank(catState)) {
-            String errorMessage = String.format("Private Cat %s does not exist", key);
-            log.log(Level.WARNING , errorMessage);
-
-            throw new ChaincodeException(errorMessage);
-        }
 
         stub.delPrivateData(collection , key);
 
-        return JSON.parseObject(catState , Cat.class);
     }
 
     private String getCollectionName(final ChaincodeStub stub) {
