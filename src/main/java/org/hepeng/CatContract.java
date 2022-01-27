@@ -186,7 +186,7 @@ public class CatContract implements ContractInterface {
                 .setAge(age)
                 .setBreed(breed)
                 .setColor(color))
-                .setMspId(stub.getMspId());
+                .setCollection(collection);
 
         String json = JSON.toJSONString(cat);
 
@@ -216,7 +216,7 @@ public class CatContract implements ContractInterface {
                         .setAge(age)
                         .setBreed(breed)
                         .setColor(color))
-                .setMspId(stub.getMspId());
+                .setCollection(collection);
 
         String json = JSON.toJSONString(cat);
 

@@ -19,5 +19,5 @@ public class PrivateCat {
     Cat cat;
 
     @Property
-    String mspId;
+    String collection;
 }
