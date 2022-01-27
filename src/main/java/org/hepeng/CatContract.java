@@ -132,11 +132,10 @@ public class CatContract implements ContractInterface {
     }
 
     @Transaction
-    public byte[] queryPrivateCatHash(final Context ctx, final String key) {
+    public byte[] queryPrivateCatHash(final Context ctx, final String collection ,final String key) {
 
         ChaincodeStub stub = ctx.getStub();
 
-        String collection = getCollectionName(stub);
         byte[] hash = stub.getPrivateDataHash(collection, key);
 
         if (ArrayUtils.isEmpty(hash)) {
