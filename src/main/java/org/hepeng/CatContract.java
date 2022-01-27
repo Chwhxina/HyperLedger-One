@@ -149,13 +149,12 @@ public class CatContract implements ContractInterface {
     }
 
     @Transaction
-    public Cat queryPrivateCat(final Context ctx, final String key) {
+    public PrivateCat queryPrivateCat(final Context ctx, final String collection , final String key) {
 
         ChaincodeStub stub = ctx.getStub();
 
-        log.info(String.format("查询私有数据 , key [%s] , mspId [%s] " , stub.getMspId() , key));
+        log.info(String.format("查询私有数据 , collection [%s] key [%s] , mspId [%s] " , collection , stub.getMspId() , key));
 
-        String collection = getCollectionName(stub);
         String catState = stub.getPrivateDataUTF8(collection , key);
 
         if (StringUtils.isBlank(catState)) {
@@ -169,20 +168,25 @@ public class CatContract implements ContractInterface {
 
 
     @Transaction
-    public PrivateCat createPrivateCat(final Context ctx, final String key , String name , Integer age , String color , String breed) {
+    public PrivateCat createPrivateCat(final Context ctx, final String collection , final String key , String name , Integer age , String color , String breed) {
 
         ChaincodeStub stub = ctx.getStub();
-        log.info(String.format("创建私有数据 , mspId [%s] , key [%s] , name [%s] age [%s] color [%s] breed [%s] " , stub.getMspId() , key , name , age , color , breed));
+        log.info(String.format("创建私有数据 , collection [%s] , mspId [%s] , key [%s] , name [%s] age [%s] color [%s] breed [%s] " , collection , stub.getMspId() , key , name , age , color , breed));
 
-        String collection = getCollectionName(stub);
+        String catState = stub.getPrivateDataUTF8(collection , key);
 
-        PrivateCat cat = new PrivateCat();
-        cat.setName(name)
+        if (StringUtils.isNotBlank(catState)) {
+            String errorMessage = String.format("Private Cat %s already exists", key);
+            log.log(Level.WARNING , errorMessage);
+            throw new ChaincodeException(errorMessage);
+        }
+
+        PrivateCat cat = new PrivateCat()
+                .setCat(new Cat().setName(name)
                 .setAge(age)
                 .setBreed(breed)
-                .setColor(color);
-
-        cat.setMspId(stub.getMspId());
+                .setColor(color))
+                .setMspId(stub.getMspId());
 
         String json = JSON.toJSONString(cat);
 
@@ -194,20 +198,25 @@ public class CatContract implements ContractInterface {
     }
 
     @Transaction
-    public PrivateCat updatePrivateCat(final Context ctx, final String key , String name , Integer age , String color , String breed) {
+    public PrivateCat updatePrivateCat(final Context ctx, final String collection, final String key , String name , Integer age , String color , String breed) {
 
         ChaincodeStub stub = ctx.getStub();
-        log.info(String.format("更新私有数据 , mspId [%s] , key [%s] , name [%s] age [%s] color [%s] breed [%s] " , stub.getMspId() , key , name , age , color , breed));
+        log.info(String.format("更新私有数据 , collection [%s] , mspId [%s] , key [%s] , name [%s] age [%s] color [%s] breed [%s] " , collection,stub.getMspId() , key , name , age , color , breed));
 
-        String collection = getCollectionName(stub);
+        String catState = stub.getPrivateDataUTF8(collection , key);
 
-        PrivateCat cat = new PrivateCat();
-        cat.setName(name)
-                .setAge(age)
-                .setBreed(breed)
-                .setColor(color);
+        if (StringUtils.isBlank(catState)) {
+            String errorMessage = String.format("Private Cat %s does not exist", key);
+            log.log(Level.WARNING , errorMessage);
+            throw new ChaincodeException(errorMessage);
+        }
 
-        cat.setMspId(stub.getMspId());
+        PrivateCat cat = new PrivateCat()
+                .setCat(new Cat().setName(name)
+                        .setAge(age)
+                        .setBreed(breed)
+                        .setColor(color))
+                .setMspId(stub.getMspId());
 
         String json = JSON.toJSONString(cat);
 
@@ -219,16 +228,24 @@ public class CatContract implements ContractInterface {
     }
 
     @Transaction
-    public void deletePrivateCat(final Context ctx, final String key) {
+    public PrivateCat deletePrivateCat(final Context ctx, final String collection ,final String key) {
 
         ChaincodeStub stub = ctx.getStub();
 
-        log.info(String.format("删除私有数据 , mspId [%s] , key [%s] " , stub.getMspId() , key));
+        log.info(String.format("删除私有数据 , collection [%s] , mspId [%s] , key [%s] " , collection , stub.getMspId() , key));
 
-        String collection = getCollectionName(stub);
+        String catState = stub.getPrivateDataUTF8(collection , key);
+
+        if (StringUtils.isBlank(catState)) {
+            String errorMessage = String.format("Private Cat %s does not exist", key);
+            log.log(Level.WARNING , errorMessage);
+
+            throw new ChaincodeException(errorMessage);
+        }
 
         stub.delPrivateData(collection , key);
 
+        return JSON.parseObject(catState , PrivateCat.class);
     }
 
     private String getCollectionName(final ChaincodeStub stub) {
@@ -240,12 +257,12 @@ public class CatContract implements ContractInterface {
 
     @Override
     public void beforeTransaction(Context ctx) {
-        System.out.println("*************************************** 交易开始前 ***************************************");
+        log.info("*************************************** beforeTransaction ***************************************");
     }
 
     @Override
     public void afterTransaction(Context ctx, Object result) {
-        System.out.println("*************************************** 交易后 ***************************************");
+        log.info("*************************************** afterTransaction ***************************************");
         System.out.println("result --------> " + result);
     }
 }
