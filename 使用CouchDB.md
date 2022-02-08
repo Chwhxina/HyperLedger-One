@@ -75,3 +75,54 @@ CouchDB保证最终一致性，使其能够同时提供可用性和分割容忍�
 CoucbDB能够同步复制到可能会离线的终端设备（比如智能手机），同时当设置再次在线时处理数据同步。
 CouchDB内置了一个的叫做Futon的通过web访问的管理接口。
 
+# 4 创建索引
+
+为什么索引很重要？
+
+索引可以让数据库不用在每次查询的时候都检查每一行，可以让数据库运行的更快和更高效。
+ 一般来说，对频繁查询的数据进行索引可以使数据查询更高效。
+ 为了充分发挥 CouchDB 的优势 – 对 JSON 数据进行富查询的能力 – 并不需要索引，
+ 但是为了性能考虑强烈建议建立 索引。另外，如果在一个查询中需要排序，CouchDB 需要在排序的字段有一个索引。
+
+# 4.1 索引定义
+
+JSON 索引文件必须放在链码目录的 META-INF/statedb/couchdb/indexes 路径下。索引文件名称可以任意。
+
+```json5
+{
+  "index":{
+      "fields":["docType","owner"] // Names of the fields to be queried
+  },
+  "ddoc":"indexOwnerDoc", // (optional) Name of the design document in which the index will be created.
+  "name":"indexOwner",
+  "type":"json"
+}
+```
+```json5
+{
+  "index": {
+    "fields": [
+      "name",
+      "color"
+    ]
+  },
+  "ddoc": "indexNameColorDoc",
+  "name": "indexNameColor",
+  "type": "json"
+}
+```
+
+CouchDB 可以根 据查询的字段决定使用哪个索引。
+如果这个查询准则存在索引，它就会被使用。但是建议在查询的时候指定 use_index 关键字。
+
+```json5
+{
+    "selector":{
+        "name":"tom"
+    },
+    "use_index":[
+        "_design/indexNameColorDoc",
+        "indexNameColor"
+    ]
+}
+```
