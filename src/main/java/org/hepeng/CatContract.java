@@ -80,16 +80,18 @@ public class CatContract implements ContractInterface {
     }
 
     @Transaction
-    public List<CatQueryResult> queryCatByName(final Context ctx, String name) {
+    public CatQueryResultList queryCatByName(final Context ctx, String name) {
 
         log.info(String.format("使用 name 查询 cat , name = %s" , name));
 
         String query = String.format("{\"selector\":{\"name\":\"%s\"} , \"use_index\":[\"_design/indexNameColorDoc\", \"indexNameColor\"]}\"]}", name);
+
+        log.info(String.format("query string = %s" , query));
         return queryCat(ctx.getStub() , query);
     }
 
     @Transaction
-    public List<CatQueryResult> queryCatByNameAndColor(final Context ctx, String name , String color) {
+    public CatQueryResultList queryCatByNameAndColor(final Context ctx, String name , String color) {
 
         log.info(String.format("使用 name & color 查询 cat , name = %s , color = %s" , name , color));
 
@@ -97,8 +99,9 @@ public class CatContract implements ContractInterface {
         return queryCat(ctx.getStub() , query);
     }
 
-    private List<CatQueryResult> queryCat(ChaincodeStub stub , String query) {
+    private CatQueryResultList queryCat(ChaincodeStub stub , String query) {
 
+        CatQueryResultList resultList = new CatQueryResultList();
         QueryResultsIterator<KeyValue> queryResult = stub.getQueryResult(query);
         List<CatQueryResult> results = Lists.newArrayList();
 
@@ -106,9 +109,10 @@ public class CatContract implements ContractInterface {
             for (KeyValue kv : queryResult) {
                 results.add(new CatQueryResult().setKey(kv.getKey()).setCat(JSON.parseObject(kv.getStringValue() , Cat.class)));
             }
+            resultList.setCats(results);
         }
 
-        return results;
+        return resultList;
     }
 
     @Transaction
