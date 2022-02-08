@@ -84,7 +84,7 @@ public class CatContract implements ContractInterface {
 
         log.info(String.format("使用 name 查询 cat , name = %s" , name));
 
-        String query = String.format("{\"selector\":{\"name\":\"%s\"} , \"use_index\":[\"_design/indexNameColorDoc\", \"indexNameColor\"]}\"]}", name);
+        String query = String.format("{\"selector\":{\"name\":\"%s\"} , \"use_index\":[\"_design/indexNameColorDoc\", \"indexNameColor\"]\"}", name);
 
         log.info(String.format("query string = %s" , query));
         return queryCat(ctx.getStub() , query);
@@ -95,7 +95,7 @@ public class CatContract implements ContractInterface {
 
         log.info(String.format("使用 name & color 查询 cat , name = %s , color = %s" , name , color));
 
-        String query = String.format("{\"selector\":{\"name\":\"%s\" , \"color\":\"%s\"} , \"use_index\":[\"_design/indexNameColorDoc\", \"indexNameColor\"]}\"]}", name , color);
+        String query = String.format("{\"selector\":{\"name\":\"%s\" , \"color\":\"%s\"} , \"use_index\":[\"_design/indexNameColorDoc\", \"indexNameColor\"]\"}", name , color);
         return queryCat(ctx.getStub() , query);
     }
 
