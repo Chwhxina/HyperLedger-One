@@ -21,7 +21,7 @@
 
     <repositories>
 
-        <repository>
+        <!--<repository>
             <id>aliyun</id>
             <url>https://maven.aliyun.com/repository/public</url>
             <releases>
@@ -30,7 +30,7 @@
             <snapshots>
                 <enabled>true</enabled>
             </snapshots>
-        </repository>
+        </repository>-->
 
         <repository>
             <id>jitpack.io</id>
