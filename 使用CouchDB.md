@@ -126,3 +126,13 @@ CouchDB 可以根 据查询的字段决定使用哪个索引。
     ]
 }
 ```
+
+启动测试网络使用 couchdb :
+```
+./network.sh up createChannel -s couchdb
+```
+
+> Fauxton 是用于创建、升级和部署 CouchDB 索引的一个网页，
+如果你想尝试这个接口， 有一个 Marbles 示例中索引的 Fauxton 版本格式的例子。
+如果你使用 CouchDB 部署了测试网络，可以通过在浏览器的导航栏中打开 
+http://localhost:5984/_utils 来 访问 Fauxton 。
