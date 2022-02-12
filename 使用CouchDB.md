@@ -136,3 +136,8 @@ CouchDB 可以根 据查询的字段决定使用哪个索引。
 如果你想尝试这个接口， 有一个 Marbles 示例中索引的 Fauxton 版本格式的例子。
 如果你使用 CouchDB 部署了测试网络，可以通过在浏览器的导航栏中打开 
 http://localhost:5984/_utils 来 访问 Fauxton 。
+
+
+```
+peer chaincode query -C mychannel -n hyperledger-fabric-contract-java-demo -c '{"Args":["queryCatByName" , "tom"]}'
+```
