@@ -139,5 +139,9 @@ http://localhost:5984/_utils 来 访问 Fauxton 。
 
 
 ```
+peer chaincode invoke -o localhost:7050 --ordererTLSHostnameOverride orderer.example.com --tls --cafile ${PWD}/organizations/ordererOrganizations/example.com/orderers/orderer.example.com/msp/tlscacerts/tlsca.example.com-cert.pem -C mychannel -n hyperledger-fabric-contract-java-demo --peerAddresses localhost:7051 --tlsRootCertFiles ${PWD}/organizations/peerOrganizations/org1.example.com/peers/peer0.org1.example.com/tls/ca.crt --peerAddresses localhost:9051 --tlsRootCertFiles ${PWD}/organizations/peerOrganizations/org2.example.com/peers/peer0.org2.example.com/tls/ca.crt -c '{"function":"createCat","Args":["cat-0" , "tom" ,  "3" , "蓝色" , "大懒猫"]}'
+
 peer chaincode query -C mychannel -n hyperledger-fabric-contract-java-demo -c '{"Args":["queryCatByName" , "tom"]}'
+
+peer chaincode query -C mychannel -n hyperledger-fabric-contract-java-demo -c '{"Args":["queryCatPageByName" , "tom" , "1" , ""]}'
 ```
