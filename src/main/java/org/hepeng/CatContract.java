@@ -3,7 +3,6 @@ package org.hepeng;
 import com.alibaba.fastjson.JSON;
 import com.google.common.collect.Lists;
 import lombok.extern.java.Log;
-import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.collections4.IterableUtils;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -19,9 +18,8 @@ import org.hyperledger.fabric.shim.ChaincodeException;
 import org.hyperledger.fabric.shim.ChaincodeStub;
 import org.hyperledger.fabric.shim.ledger.KeyValue;
 import org.hyperledger.fabric.shim.ledger.QueryResultsIterator;
+import org.hyperledger.fabric.shim.ledger.QueryResultsIteratorWithMetadata;
 
-import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.Random;
 import java.util.logging.Level;
@@ -84,10 +82,35 @@ public class CatContract implements ContractInterface {
 
         log.info(String.format("使用 name 查询 cat , name = %s" , name));
 
-        String query = String.format("{\"selector\":{\"name\":\"%s\"} , \"use_index\":[\"_design/indexNameColorDoc\", \"indexNameColor\"]\"}", name);
+        String query = String.format("{\"selector\":{\"name\":\"%s\"} , \"use_index\":[\"_design/indexNameColorDoc\", \"indexNameColor\"]}", name);
 
         log.info(String.format("query string = %s" , query));
         return queryCat(ctx.getStub() , query);
+    }
+
+    @Transaction
+    public CatQueryPageResult queryCatPageByName(final Context ctx, String name , Integer pageSize , String bookmark) {
+
+        log.info(String.format("使用 name 分页查询 cat , name = %s" , name));
+
+        String query = String.format("{\"selector\":{\"name\":\"%s\"} , \"use_index\":[\"_design/indexNameColorDoc\", \"indexNameColor\"]}", name);
+
+        log.info(String.format("query string = %s" , query));
+
+        ChaincodeStub stub = ctx.getStub();
+        QueryResultsIteratorWithMetadata<KeyValue> queryResult = stub.getQueryResultWithPagination(query, pageSize, bookmark);
+
+        List<CatQueryResult> cats = Lists.newArrayList();
+
+        if (! IterableUtils.isEmpty(queryResult)) {
+            for (KeyValue kv : queryResult) {
+                cats.add(new CatQueryResult().setKey(kv.getKey()).setCat(JSON.parseObject(kv.getStringValue() , Cat.class)));
+            }
+        }
+
+        return new CatQueryPageResult()
+                .setCats(cats)
+                .setBookmark(queryResult.getMetadata().getBookmark());
     }
 
     @Transaction
@@ -95,9 +118,10 @@ public class CatContract implements ContractInterface {
 
         log.info(String.format("使用 name & color 查询 cat , name = %s , color = %s" , name , color));
 
-        String query = String.format("{\"selector\":{\"name\":\"%s\" , \"color\":\"%s\"} , \"use_index\":[\"_design/indexNameColorDoc\", \"indexNameColor\"]\"}", name , color);
+        String query = String.format("{\"selector\":{\"name\":\"%s\" , \"color\":\"%s\"} , \"use_index\":[\"_design/indexNameColorDoc\", \"indexNameColor\"]}", name , color);
         return queryCat(ctx.getStub() , query);
     }
+
 
     private CatQueryResultList queryCat(ChaincodeStub stub , String query) {
 
@@ -289,13 +313,6 @@ public class CatContract implements ContractInterface {
         stub.delPrivateData(collection , key);
 
         return JSON.parseObject(catState , PrivateCat.class);
-    }
-
-    private String getCollectionName(final ChaincodeStub stub) {
-
-        String name = "collection" + stub.getMspId() + "Cats";
-        log.info(String.format("私有数据集合名称 [%s]" , name));
-        return name;
     }
 
     @Override

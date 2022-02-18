@@ -126,3 +126,22 @@ CouchDB 可以根 据查询的字段决定使用哪个索引。
     ]
 }
 ```
+
+启动测试网络使用 couchdb :
+```
+./network.sh up createChannel -s couchdb
+```
+
+> Fauxton 是用于创建、升级和部署 CouchDB 索引的一个网页，
+如果你想尝试这个接口， 有一个 Marbles 示例中索引的 Fauxton 版本格式的例子。
+如果你使用 CouchDB 部署了测试网络，可以通过在浏览器的导航栏中打开 
+http://localhost:5984/_utils 来 访问 Fauxton 。
+
+
+```
+peer chaincode invoke -o localhost:7050 --ordererTLSHostnameOverride orderer.example.com --tls --cafile ${PWD}/organizations/ordererOrganizations/example.com/orderers/orderer.example.com/msp/tlscacerts/tlsca.example.com-cert.pem -C mychannel -n hyperledger-fabric-contract-java-demo --peerAddresses localhost:7051 --tlsRootCertFiles ${PWD}/organizations/peerOrganizations/org1.example.com/peers/peer0.org1.example.com/tls/ca.crt --peerAddresses localhost:9051 --tlsRootCertFiles ${PWD}/organizations/peerOrganizations/org2.example.com/peers/peer0.org2.example.com/tls/ca.crt -c '{"function":"createCat","Args":["cat-0" , "tom" ,  "3" , "蓝色" , "大懒猫"]}'
+
+peer chaincode query -C mychannel -n hyperledger-fabric-contract-java-demo -c '{"Args":["queryCatByName" , "tom"]}'
+
+peer chaincode query -C mychannel -n hyperledger-fabric-contract-java-demo -c '{"Args":["queryCatPageByName" , "tom" , "1" , ""]}'
+```
