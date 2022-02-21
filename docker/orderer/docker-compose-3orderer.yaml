@@ -46,7 +46,8 @@ services:
         container_name: orderer0.example.com
         hostname: orderer0.example.com
         ports:
-            - "7050:7050"
+            - 7050:7050
+            - 8443:8443
         extra_hosts:
             - "orderer0.example.com:192.168.0.105"
             - "orderer1.example.com:192.168.0.105"
@@ -93,7 +94,8 @@ services:
         container_name: orderer1.example.com
         hostname: orderer1.example.com
         ports:
-            - "8050:7050"
+            - 8050:7050
+            - 8444:8443
         extra_hosts:
             - "orderer0.example.com:192.168.0.105"
             - "orderer1.example.com:192.168.0.105"
@@ -139,7 +141,8 @@ services:
         container_name: orderer2.example.com
         hostname: orderer2.example.com
         ports:
-            - "9050:7050"
+            - 9050:7050
+            - 8445:8443
         extra_hosts:
             - "orderer0.example.com:192.168.0.105"
             - "orderer1.example.com:192.168.0.105"
