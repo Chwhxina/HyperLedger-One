@@ -157,6 +157,8 @@ public class CatContract implements ContractInterface {
                 .setColor(color);
 
         stub.putStringState(key, JSON.toJSONString(cat));
+
+        stub.setEvent("createCatEvent" , JSON.toJSONBytes(cat));
         return cat;
     }
 
