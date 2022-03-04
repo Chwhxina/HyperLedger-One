@@ -13,6 +13,7 @@ services:
         image: hyperledger/explorer-db:latest
         container_name: explorerdb.mynetwork.com
         hostname: explorerdb.mynetwork.com
+        restart: always
         ports:
             - 5432:5432
         environment:
@@ -32,6 +33,7 @@ services:
         image: hyperledger/explorer:latest
         container_name: explorer.mynetwork.com
         hostname: explorer.mynetwork.com
+        restart: always
         ports:
             - 9090:8080
         extra_hosts:
