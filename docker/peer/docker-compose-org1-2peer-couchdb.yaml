@@ -135,6 +135,7 @@ services:
     peer0.org1.couchdb:
         image: couchdb:3.1.1
         container_name: peer0.org1.couchdb
+        restart: always
         ports:
             - 5984:5984  # this is the restful API addr, can also access fauxton web ui thru http://localhost:5984/_utils/
         environment:
@@ -144,6 +145,7 @@ services:
     peer1.org1.couchdb:
         image: couchdb:3.1.1
         container_name: peer1.org1.couchdb
+        restart: always
         ports:
             - 6984:5984  # this is the restful API addr, can also access fauxton web ui thru http://localhost:5984/_utils/
         environment:
