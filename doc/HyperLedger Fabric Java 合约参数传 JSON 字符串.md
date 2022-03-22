@@ -115,4 +115,5 @@ peer chaincode invoke -o orderer0.example.com:7050 --ordererTLSHostnameOverride 
 
 响应结果如图：
 
-![](https://oscimg.oschina.net/oscnet/up-ba6d77f3bf878a360d8107e862f3291cf73.png)
+
+![image.png](https://p6-juejin.byteimg.com/tos-cn-i-k3u1fbpfcp/0a60aaa5243d443aaead9eff760eef51~tplv-k3u1fbpfcp-watermark.image?)

@@ -1,7 +1,6 @@
-
 # HyperLedger Fabric Java 合约 JSR303 参数校验
 
-开始阅读本篇内容前建议先看 [HyperLedger Fabric Java 合约参数传 JSON 字符串](https://my.oschina.net/j4love/blog/5495760)
+开始阅读本篇内容前建议先看 [HyperLedger Fabric Java 合约参数传 JSON 字符串](https://juejin.cn/post/7077853585291083790)
 
 ## 引入 hibernate-validator 依赖
 
@@ -146,7 +145,7 @@ peer chaincode invoke -o orderer0.example.com:7050 --ordererTLSHostnameOverride 
 
 响应如下：
 
-![](https://oscimg.oschina.net/oscnet/up-e5c17e5cd7912f95f6423d30f63d67b812c.png)
+![image.png](https://p6-juejin.byteimg.com/tos-cn-i-k3u1fbpfcp/ac27991d63334e6696550f3ab516bc68~tplv-k3u1fbpfcp-watermark.image?)
 
 ```
 [029 03-22 09:06:36.17 UTC] [chaincodeCmd] chaincodeInvokeOrQuery -> DEBU ESCC invoke result: response:<status:500 message:"\345\217\202\346\225\260\346\240\241\351\252\214\344\270\215\351\200\232\350\277\207,\351\224\231\350\257\257\344\277\241\346\201\257 {\"key\":\"key \344\270\215\350\203\275\344\270\272\347\251\272\"}" > payload:"\n \330\375*6,X\204LK\026.\222\004J\377MEc\256\256\217D\254\332\321ngO\211\031%\347\022\314\001\nX\022V\n\n_lifecycle\022H\nF\n@namespaces/fields/hyperledger-fabric-contract-java-demo/Sequence\022\002\010\023\032B\010\364\003\022=\345\217\202\346\225\260\346\240\241\351\252\214\344\270\215\351\200\232\350\277\207,\351\224\231\350\257\257\344\277\241\346\201\257 {\"key\":\"key \344\270\215\350\203\275\344\270\272\347\251\272\"}\",\022%hyperledger-fabric-contract-java-demo\032\0035.0" interest:<> 
@@ -155,7 +154,8 @@ Error: endorsement failure during invoke. response: status:500 message:"\345\217
 
 ## 查看链码日志
 
-![](https://oscimg.oschina.net/oscnet/up-55b04db68e65581e34c270eb78ad3d45d57.png)
+
+![image.png](https://p1-juejin.byteimg.com/tos-cn-i-k3u1fbpfcp/f4b785c5c03a4efbaa2e9102ce788910~tplv-k3u1fbpfcp-watermark.image?)
 
 ```
 Thread[fabric-txinvoke:1,5,main] 08:56:30:081 SEVERE  org.hyperledger.fabric.shim.impl.ChaincodeInvocationTask call                    [7f0e1107] Invoke failed with error code 500. Sending ERROR
@@ -178,3 +178,5 @@ Thread[fabric-txinvoke:2,5,main] 08:57:59:108 SEVERE  org.hyperledger.fabric.Log
 	at java.base/java.lang.Thread.run(Thread.java:834)
 Thread[fabric-txinvoke:2,5,main] 08:57:59:108 SEVERE  org.hyperledger.fabric.shim.impl.ChaincodeInvocationTask call                    [fdf8606d] Invoke failed with error code 500. Sending ERROR
 ```
+
+完整代码地址: https://gitee.com/kernelHP/hyperledger-fabric-contract-java-demo
