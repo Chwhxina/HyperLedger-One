@@ -7,7 +7,6 @@ import org.hyperledger.fabric.contract.Context;
 import org.hyperledger.fabric.contract.ContractInterface;
 import org.hyperledger.fabric.contract.annotation.Contact;
 import org.hyperledger.fabric.contract.annotation.Contract;
-import org.hyperledger.fabric.contract.annotation.Default;
 import org.hyperledger.fabric.contract.annotation.Info;
 import org.hyperledger.fabric.contract.annotation.License;
 import org.hyperledger.fabric.contract.annotation.Transaction;
@@ -24,6 +23,7 @@ import java.util.logging.Level;
 
 @Contract(
         name = "UserContract",
+        transactionSerializer = "org.hepeng.ValidationJSONTransactionSerializer" ,
         info = @Info(
                 title = "User contract",
                 description = "user contract",
@@ -35,7 +35,6 @@ import java.util.logging.Level;
                         email = "f.carr@example.com",
                         name = "User contract",
                         url = "https://hyperledger.example.com")))
-@Default
 @Log
 public class UserContract implements ContractInterface {
 
