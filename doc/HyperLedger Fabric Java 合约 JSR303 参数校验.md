@@ -1,125 +1,7 @@
 
 # HyperLedger Fabric Java 合约 JSR303 参数校验
 
-开始阅读本篇内容前建议先看 [HyperLedger Fabric Java 合约参数传 JSON 字符串](# HyperLedger Fabric Java 合约参数传 JSON 字符串
-
-> 合约中交易函数可以传多个参数，但是对于一些复杂参数这种方式就比较低效。对于复杂参数可以使用传 json 字符串的方式简化开发。
-
-## 定义参数接收对象
-
-```
-@DataType
-@Data
-public class UserInfo {
-
-    @Property
-    String key;
-
-    @Property
-    String idCard;
-
-    @Property
-    String name;
-
-    @Property
-    String sex;
-
-    @Property
-    String birthday;
-
-    @Property
-    String phone;
-
-
-}
-```
-
-## 编写合约交易函数
-
-```
-@Contract(
-        name = "UserContract",
-        info = @Info(
-                title = "User contract",
-                description = "user contract",
-                version = "0.0.1-SNAPSHOT",
-                license = @License(
-                        name = "Apache 2.0 License",
-                        url = "http://www.apache.org/licenses/LICENSE-2.0.html"),
-                contact = @Contact(
-                        email = "f.carr@example.com",
-                        name = "User contract",
-                        url = "https://hyperledger.example.com")))
-@Log
-public class UserContract implements ContractInterface {
-
-    @Transaction
-    public UserInfo regUser(Context ctx , UserInfo userInfo) {
-        ChaincodeStub stub = ctx.getStub();
-        String user = stub.getStringState(userInfo.getKey());
-
-        if (StringUtils.isNotBlank(user)) {
-            String errorMessage = String.format("User %s already exists", userInfo.getKey());
-            log.log(Level.ALL , errorMessage);
-            throw new ChaincodeException(errorMessage);
-        }
-
-        stub.putStringState(userInfo.getKey() , JSON.toJSONString(userInfo));
-
-        return userInfo;
-    }
-}
-```
-
-## Fabric 实现方式
-
-`fabric-chaincode-shim` 先将 json 字符串反序列化为 `org.json.JSONObject` 再通过反射的方式调用参数接收对象中字段的 set 函数将值绑定的目标参数接收对象中。
-
-org.hyperledger.fabric.contract.execution.JSONTransactionSerializer#createComponentInstance
-```
-    Object createComponentInstance(final String format, final String jsonString, final TypeSchema ts) {
-
-        final DataTypeDefinition dtd = this.typeRegistry.getDataType(format);
-        Object obj;
-        try {
-            obj = dtd.getTypeClass().getDeclaredConstructor().newInstance();
-        } catch (IllegalAccessException | InstantiationException | InvocationTargetException | NoSuchMethodException e1) {
-            throw new ContractRuntimeException("Unable to to create new instance of type", e1);
-        }
-
-        final JSONObject json = new JSONObject(jsonString);
-        // request validation of the type may throw an exception if validation fails
-        ts.validate(json);
-        try {
-            final Map<String, PropertyDefinition> fields = dtd.getProperties();
-            for (final Iterator<PropertyDefinition> iterator = fields.values().iterator(); iterator.hasNext();) {
-                final PropertyDefinition prop = iterator.next();
-
-                final Field f = prop.getField();
-                f.setAccessible(true);
-                final Object newValue = convert(json.get(prop.getName()).toString(), prop.getSchema());
-
-                f.set(obj, newValue);
-
-            }
-            return obj;
-        } catch (SecurityException | IllegalArgumentException | IllegalAccessException | InstantiationException | JSONException e) {
-            throw new ContractRuntimeException("Unable to convert JSON to object", e);
-        }
-
-    }
-```
-
-## CLI 客户端调用
-
-```
-peer chaincode invoke -o orderer0.example.com:7050 --ordererTLSHostnameOverride orderer0.example.com --tls --cafile /etc/hyperledger/fabric/crypto-config/ordererOrganizations/example.com/orderers/orderer0.example.com/msp/tlscacerts/tlsca.example.com-cert.pem -C businesschannel -n hyperledger-fabric-contract-java-demo --peerAddresses peer0.org1.example.com:7051 --tlsRootCertFiles /etc/hyperledger/fabric/crypto-config/peerOrganizations/org1.example.com/peers/peer0.org1.example.com/tls/ca.crt --peerAddresses peer0.org2.example.com:7051 --tlsRootCertFiles /etc/hyperledger/fabric/crypto-config/peerOrganizations/org2.example.com/peers/peer0.org2.example.com/tls/ca.crt -c '{"function":"UserContract:regUser","Args":["{\"key\":\"user-0\",\"idCard\":\"610102198910210321\",\"name\":\"哈哈哈哈lx\",\"sex\":\"男\",\"birthday\":\"1980-01-27\"}"]}
-```
-
-响应结果如图：
-
-![](https://oscimg.oschina.net/oscnet/up-ba6d77f3bf878a360d8107e862f3291cf73.png)
-)
+开始阅读本篇内容前建议先看 [HyperLedger Fabric Java 合约参数传 JSON 字符串](https://my.oschina.net/j4love/blog/5495760)
 
 ## 引入 hibernate-validator 依赖
 
@@ -264,7 +146,7 @@ peer chaincode invoke -o orderer0.example.com:7050 --ordererTLSHostnameOverride 
 
 响应如下：
 
-![](https://oscimg.oschina.net/oscnet/up-fe7f7848ac4320f0bd4c90c8424f8453bf6.png)
+![](https://oscimg.oschina.net/oscnet/up-e5c17e5cd7912f95f6423d30f63d67b812c.png)
 
 ```
 [029 03-22 09:06:36.17 UTC] [chaincodeCmd] chaincodeInvokeOrQuery -> DEBU ESCC invoke result: response:<status:500 message:"\345\217\202\346\225\260\346\240\241\351\252\214\344\270\215\351\200\232\350\277\207,\351\224\231\350\257\257\344\277\241\346\201\257 {\"key\":\"key \344\270\215\350\203\275\344\270\272\347\251\272\"}" > payload:"\n \330\375*6,X\204LK\026.\222\004J\377MEc\256\256\217D\254\332\321ngO\211\031%\347\022\314\001\nX\022V\n\n_lifecycle\022H\nF\n@namespaces/fields/hyperledger-fabric-contract-java-demo/Sequence\022\002\010\023\032B\010\364\003\022=\345\217\202\346\225\260\346\240\241\351\252\214\344\270\215\351\200\232\350\277\207,\351\224\231\350\257\257\344\277\241\346\201\257 {\"key\":\"key \344\270\215\350\203\275\344\270\272\347\251\272\"}\",\022%hyperledger-fabric-contract-java-demo\032\0035.0" interest:<> 
@@ -273,7 +155,7 @@ Error: endorsement failure during invoke. response: status:500 message:"\345\217
 
 ## 查看链码日志
 
-![](https://oscimg.oschina.net/oscnet/up-4724b696def63f936a6a6bb1df26627c1b4.png)
+![](https://oscimg.oschina.net/oscnet/up-55b04db68e65581e34c270eb78ad3d45d57.png)
 
 ```
 Thread[fabric-txinvoke:1,5,main] 08:56:30:081 SEVERE  org.hyperledger.fabric.shim.impl.ChaincodeInvocationTask call                    [7f0e1107] Invoke failed with error code 500. Sending ERROR
